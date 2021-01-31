@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
+import { Context } from "../store/appContext";
 
 export const Modal = props => {
 	const [state, setState] = useState({
 		//initialize state here
 	});
+	const { store, actions } = useContext(Context);
+	//aquí agregamos la función contexto, destructurando useContex que contiene store y action
 	return (
 		<div className="modal" tabIndex="-1" role="dialog" style={{ display: props.show ? "inline-block" : "none" }}>
 			<div className="modal-dialog" role="document">
@@ -32,7 +35,18 @@ export const Modal = props => {
 						<button type="button" className="btn btn-primary">
 							Oh no!
 						</button>
-						<button type="button" className="btn btn-secondary" data-dismiss="modal">
+						<button
+							type="button"
+							className="btn btn-secondary"
+							data-dismiss="modal"
+							onClick={async () => {
+								let success = await actions.deleteContact(props.idToDelete);
+								if (success) {
+									props.onClose();
+								} else {
+									alert("PROBLEMA BORRANDO EL CONTACTO");
+								}
+							}}>
 							Do it!
 						</button>
 					</div>
@@ -48,7 +62,8 @@ export const Modal = props => {
 Modal.propTypes = {
 	history: PropTypes.object,
 	onClose: PropTypes.func,
-	show: PropTypes.bool
+	show: PropTypes.bool,
+	idToDelete: PropTypes.number //aquí definimos el PropTypes de isToDelete como un número porque el id es un entero
 };
 
 /**
